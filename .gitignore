@@ -1,2 +1,8 @@
-# DB Files
+# DB files
 db_django/
+
+# Python files
+__pycache__/
+
+# Other files
+wait-for-it.sh
