@@ -6,3 +6,5 @@ __pycache__/
 
 # Other files
 wait-for-it.sh
+workspace.code-workspace
+.devcontainer/
