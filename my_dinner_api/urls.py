@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 
+from my_dinner_api.views import ClienteList
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    path('cliente', ClienteList.as_view(), name='clientes'),
 ]
