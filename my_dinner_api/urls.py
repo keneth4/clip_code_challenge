@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.urls import include
 
-from my_dinner_api.views import ClienteList
+from my_dinner_api.views import ClienteList, ClienteDetail, PlatilloDetail, PlatilloList, OrdenDetail, OrdenList
 
 urlpatterns = [
     path('cliente', ClienteList.as_view(), name='clientes'),
+    path('cliente/<str:pk>', ClienteDetail.as_view(), name='cliente'),
+    path('platillo', PlatilloList.as_view(), name='platillos'),
+    path('platillo/<int:pk>', PlatilloDetail.as_view(), name='platillo'),
+    path('orden', OrdenList.as_view(), name='ordenes'),
+    path('orden/<int:pk>', OrdenDetail.as_view(), name='orden'),
 ]
