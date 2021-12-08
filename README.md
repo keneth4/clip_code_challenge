@@ -6,6 +6,7 @@
 
 ### Setting everything up
 ```bash
+cd clip_code_challenge
 chmod +x wait-for-it.sh
 docker-compose up
 ```
