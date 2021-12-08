@@ -6,6 +6,7 @@
 
 ### Setting everything up
 ```bash
+git clone https://github.com/keneth4/clip_code_challenge.git
 cd clip_code_challenge
 chmod +x wait-for-it.sh
 docker-compose up
