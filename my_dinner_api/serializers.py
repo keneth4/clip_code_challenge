@@ -1,13 +1,12 @@
+import pytz, datetime, json
 from re import split
 from rest_framework import serializers
-
 from my_dinner_api.models import Cliente, Platillo, Orden
 
-class ClienteSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    nombre = serializers.CharField()
-    domicilio = serializers.CharField()
-    telefono = serializers.CharField()
+class ClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = ['email', 'nombre', 'domicilio', 'telefono']
 
     def create(self, validated_data):
         validated_data['domicilio'] = split(',',validated_data['domicilio'])
@@ -16,50 +15,38 @@ class ClienteSerializer(serializers.Serializer):
             if domicilio[-1] == ' ': validated_data['domicilio'][i] = domicilio[:-1]
         return Cliente.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        instance.nombre = validated_data.get('nombre', instance.nombre)
-        instance.domicilio = validated_data.get('domicilio', instance.domicilio)
-        instance.telefono = validated_data.get('telefono', instance.telefono)
-        instance.save()
-        return instance
+class PlatilloSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Platillo
+        fields = ['id', 'nombre', 'descripcion', 'precio', 'tipo', 'estatus']
 
-class PlatilloSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    nombre = serializers.CharField()
-    descripcion = serializers.CharField()
-    precio = serializers.FloatField()
-    tipo = serializers.ChoiceField(Platillo.TipoDeCocina.choices)
-    estatus = serializers.ChoiceField(Platillo.OpcionesDeEstatus.choices)
+    def to_internal_value(self, data):
+        data['tipo'] = str(data['tipo'])[0].upper()
+        data['estatus'] = str(data['estatus'])[0].upper()
+        return super().to_internal_value(data)
 
-    def create(self, validated_data):
-        return Platillo.objects.create(**validated_data)
+class OrdenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Orden
+        fields = ['id', 'cliente', 'timestamp', 'total', 'detalle']
 
-    def update(self, instance, validated_data):
-        instance.id = validated_data.get('id', instance.id)
-        instance.nombre = validated_data.get('nombre', instance.nombre)
-        instance.descripcion = validated_data.get('descripcion', instance.descripcion)
-        instance.precio = validated_data.get('precio', instance.precio)
-        instance.tipo = validated_data.get('tipo', instance.tipo)
-        instance.estatus = validated_data.get('estatus', instance.estatus)
-        instance.save()
-        return instance
-
-class OrdenSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    cliente = serializers.CharField()
-    timestamp = serializers.DateTimeField()
-    total = serializers.FloatField()
-    detalle = serializers.CharField()
-
-    def create(self, validated_data):
-        return Orden.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.id = validated_data.get('id', instance.id)
-        instance.cliente = validated_data.get('cliente', instance.cliente)
-        instance.timestamp = validated_data.get('timestamp', instance.timestamp)
-        instance.total = validated_data.get('total', instance.total)
-        instance.detalle = validated_data.get('detalle', instance.detalle)
-        instance.save()
-        return instance
+    def to_internal_value(self, data):
+        instance = self.instance
+        if instance:
+            data['cliente'] = instance.cliente.email
+            data['timestamp'] = instance.timestamp
+        else:
+            data['timestamp'] = datetime.datetime.now(pytz.timezone('America/Mexico_City'))
+        detalle_orden = json.loads(str(data['detalle']).replace('\'','"'))
+        cliente = Cliente.objects.filter(email=data['cliente']).first()
+        detalle_str = 'Pedido para ' + cliente.nombre + '\nDirección: ' + json.loads(str(cliente.domicilio).replace('\'','"'))[0] + '\n\n'
+        total = 0
+        for orden in detalle_orden:
+            platillo = Platillo.objects.filter(id=orden['id_platillo']).first()
+            subtotal = platillo.precio * orden['cantidad']
+            total += subtotal
+            detalle_str += platillo.nombre + ' x' + str(orden['cantidad']) + ' = ' + str(subtotal) + '\n'
+        detalle_str += '\nTotal = ' + str(total)
+        data['detalle'] = detalle_str
+        data['total'] = total
+        return super().to_internal_value(data)

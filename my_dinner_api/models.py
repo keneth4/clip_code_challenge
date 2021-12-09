@@ -19,6 +19,7 @@ class Platillo(models.Model):
         DISPONIBLE = 'D', _('Disponible')
         NO_DISPONIBLE = 'N', _('No disponible')
 
+    id = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=254)
     descripcion = models.CharField(max_length=512)
     precio = models.FloatField()
@@ -26,6 +27,7 @@ class Platillo(models.Model):
     estatus = models.CharField(max_length=1, choices=OpcionesDeEstatus.choices)
 
 class Orden(models.Model):
+    id = models.BigAutoField(primary_key=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     timestamp = models.DateTimeField()
     total = FloatField()
