@@ -29,8 +29,8 @@ class PlatilloSerializer(serializers.Serializer):
     nombre = serializers.CharField()
     descripcion = serializers.CharField()
     precio = serializers.FloatField()
-    tipo = serializers.ChoiceField(Platillo.TIPO_DE_COCINA)
-    estatus = serializers.ChoiceField(Platillo.OPCIONES_DE_ESTATUS)
+    tipo = serializers.ChoiceField(Platillo.TipoDeCocina.choices)
+    estatus = serializers.ChoiceField(Platillo.OpcionesDeEstatus.choices)
 
     def create(self, validated_data):
         return Platillo.objects.create(**validated_data)
