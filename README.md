@@ -13,4 +13,4 @@ docker-compose up
 ```
 
 ### Endpoints
-Home [http://0.0.0.0:8000/](http://0.0.0.0:8000/)
+All endpoints and their examples can be found in the Postman collection file `Clip code challenge.postman_collection.json` within the project folder
