@@ -1,4 +1,4 @@
-# Clip code challenge
+# Simple Django/DRF API Example
 
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/)
